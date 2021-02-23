@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="textview">KOTA</string>
+    <string name="button">Detail</string>
+    <string name="CuacaKota">TextView</string>
+    <string name="Suhu">TextView</string>
+    <string name="Vibe">TextView</string>
+    <string name="Wind">TextView</string>
+    <string name="Precipitation">TextView</string>
+    <string name="Visibility">TextView</string>
+</resources>
