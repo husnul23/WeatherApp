@@ -3,10 +3,20 @@ package com.husnul23.weatherapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.AsyncHttpResponseHandler
 import cz.msebera.android.httpclient.Header
+import kotlinx.android.synthetic.main.activity_detail_city.*
+import kotlinx.android.synthetic.main.activity_detail_city.view.*
+import kotlinx.android.synthetic.main.activity_detail_city.humidityKota
+import kotlinx.android.synthetic.main.activity_detail_city.kotaCuaca
+import kotlinx.android.synthetic.main.activity_detail_city.pressureKota
+import kotlinx.android.synthetic.main.activity_detail_city.suhuKota
+import kotlinx.android.synthetic.main.activity_detail_city.tempMax
+import kotlinx.android.synthetic.main.activity_detail_city.tempMin
+import kotlinx.android.synthetic.main.activity_detail_city.vibeKota
 import org.json.JSONObject
 import java.lang.Exception
 
@@ -17,13 +27,19 @@ class DetailCityActivity : AppCompatActivity() {
         const val USER_TOKEN = "41967ef9df3bcc3b1bc153c689771049"
     }
 
-    lateinit var weather: Weather
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_city)
         val intent = intent
         val cityName = intent.getStringExtra(EXTRA_CITY)
+
+        kotaCuaca.visibility = View.GONE
+        tempMin.visibility = View.GONE
+        tempMax.visibility = View.GONE
+        vibeKota.visibility = View.GONE
+        suhuKota.visibility = View.GONE
+        pressureKota.visibility = View.GONE
+        humidityKota.visibility = View.GONE
 
         getCityDetail(cityName)
     }
@@ -31,8 +47,8 @@ class DetailCityActivity : AppCompatActivity() {
     private fun getCityDetail(cityName: String?) {
         val client = AsyncHttpClient()
         val url = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + USER_TOKEN
+        progressBar.visibility = View.VISIBLE
 
-//        val url = "https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$USER_TOKEN"
         client.addHeader("Authorization", DetailCityActivity.USER_TOKEN)
         client.addHeader("User-Agent", "request")
         client.get(url, object : AsyncHttpResponseHandler() {
@@ -41,32 +57,47 @@ class DetailCityActivity : AppCompatActivity() {
                 headers: Array<out Header>?,
                 responseBody: ByteArray?
             ) {
+                progressBar.visibility = View.GONE
                 val listCity = ArrayList<Weather>()
                 val result = String(responseBody!!)
                 try {
                     val item = JSONObject(result)
                     val details = item.getJSONArray("weather")
-                    val main = item.getJSONArray("main")
-
+                    val main = item.getJSONObject("main")
                     val weather = Weather()
 
-                    for (i in 0 until main.length()) {
-                        val info = main.getJSONObject(i)
-                        val temp = info.getString("temp")
-                        val tempMin = info.getString("temp_min")
-                        val tempMax = info.getString("temp_max")
-                        val pressure = info.getString("pressure")
-                        val himidity = info.getString("humidity")
-                        val feelsLike = info.getString("feels_like")
+                    val city = item.getString("name")
+                    val temp = main.getString("temp")
+                    val temperatureMin = main.getString("temp_min")
+                    val temperatureMax = main.getString("temp_max")
+                    val pressure = main.getString("pressure")
+                    val himidity = main.getString("humidity")
+                    val feelsLike = main.getString("feels_like")
 
-                        weather.temp = temp
-                        weather.temp_min = tempMin
-                        weather.temp_max = tempMax
-                        weather.pressure = pressure
-                        weather.himidity = himidity
-                        weather.feels_like = feelsLike
-                        listCity.add(weather)
-                    }
+                    kotaCuaca.visibility = View.VISIBLE
+                    tempMin.visibility = View.VISIBLE
+                    tempMax.visibility = View.VISIBLE
+                    vibeKota.visibility = View.VISIBLE
+                    suhuKota.visibility = View.VISIBLE
+                    pressureKota.visibility = View.VISIBLE
+                    humidityKota.visibility = View.VISIBLE
+
+                    weather.temp = temp
+                    weather.temp_min = temperatureMin
+                    weather.temp_max = temperatureMax
+                    weather.pressure = pressure
+                    weather.himidity = himidity
+                    weather.feels_like = feelsLike
+                    weather.city = city
+
+                    kotaCuaca.setText(city)
+                    tempMin.setText("Temperature Min :$temperatureMin")
+                    tempMax.setText("Temperature Max :$temperatureMax")
+                    vibeKota.setText("Feels Like :$feelsLike")
+                    suhuKota.setText("$temp Celcius")
+                    pressureKota.setText("Pressure :$pressure")
+                    humidityKota.setText("Humidity :$himidity")
+
 
                     for (i in 0 until details.length()) {
                         val detail = details.getJSONObject(i)

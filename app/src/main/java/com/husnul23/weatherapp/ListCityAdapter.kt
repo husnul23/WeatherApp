@@ -1,6 +1,5 @@
 package com.husnul23.weatherapp
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
